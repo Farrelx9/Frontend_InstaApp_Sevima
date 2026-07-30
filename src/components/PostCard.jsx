@@ -1,16 +1,23 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Heart, MessageCircle, Bookmark, MoreHorizontal, Trash2, Send } from 'lucide-react';
-import { toggleLike, deletePost } from '../services/api';
-import toast from 'react-hot-toast';
-import Avatar from './Avatar';
-import TimeAgo from './TimeAgo';
-import { getImageUrl } from '../utils/image';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Heart,
+  MessageCircle,
+  Bookmark,
+  MoreHorizontal,
+  Trash2,
+  Send,
+} from "lucide-react";
+import { toggleLike, deletePost } from "../services/api";
+import toast from "react-hot-toast";
+import Avatar from "./Avatar";
+import TimeAgo from "./TimeAgo";
+import { getImageUrl } from "../utils/image";
 
 export default function PostCard({ post, currentUser, onDelete }) {
   const navigate = useNavigate();
   const [liked, setLiked] = useState(
-    post.likes?.some((l) => l.user_id === currentUser?.id) || false
+    post.likes?.some((l) => l.user_id === currentUser?.id) || false,
   );
   const [likeCount, setLikeCount] = useState(post.likes?.length || 0);
   const [likeLoading, setLikeLoading] = useState(false);
@@ -22,7 +29,7 @@ export default function PostCard({ post, currentUser, onDelete }) {
 
   const handleLike = async (e) => {
     e?.stopPropagation();
-    if (!currentUser) return toast.error('Please login first');
+    if (!currentUser) return toast.error("Please login first");
     if (likeLoading) return;
     setLikeLoading(true);
     const wasLiked = liked;
@@ -48,13 +55,13 @@ export default function PostCard({ post, currentUser, onDelete }) {
   const handleDelete = async (e) => {
     e.stopPropagation();
     setShowMenu(false);
-    if (!confirm('Delete this post?')) return;
+    if (!confirm("Delete this post?")) return;
     try {
       await deletePost(post.id);
-      toast.success('Post deleted');
+      toast.success("Post deleted");
       onDelete(post.id);
     } catch {
-      toast.error('Cannot delete post');
+      toast.error("Cannot delete post");
     }
   };
 
@@ -63,7 +70,7 @@ export default function PostCard({ post, currentUser, onDelete }) {
   return (
     <article className="bg-[#000] border-b border-[#262626] pb-2">
       {/* ── Post Header ── */}
-      <div className="flex items-center justify-between px-1 py-3">
+      <div className="flex items-center justify-between px-3 sm:px-4 py-3">
         <div className="flex items-center gap-3 cursor-pointer">
           {/* Avatar with gradient ring */}
           <div className="p-[2px] rounded-full bg-gradient-to-bl from-yellow-400 via-pink-500 to-purple-600">
@@ -76,7 +83,10 @@ export default function PostCard({ post, currentUser, onDelete }) {
               {post.user?.name}
             </p>
             <div className="flex items-center gap-1">
-              <TimeAgo date={post.created_at} className="text-gray-400 text-xs" />
+              <TimeAgo
+                date={post.created_at}
+                className="text-gray-400 text-xs"
+              />
             </div>
           </div>
         </div>
@@ -85,7 +95,10 @@ export default function PostCard({ post, currentUser, onDelete }) {
         <div className="relative">
           <button
             id={`post-menu-${post.id}`}
-            onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowMenu(!showMenu);
+            }}
             className="p-2 text-gray-400 hover:text-white transition-colors"
           >
             <MoreHorizontal size={20} />
@@ -102,7 +115,10 @@ export default function PostCard({ post, currentUser, onDelete }) {
                 </button>
               )}
               <button
-                onClick={() => { setShowMenu(false); navigate(`/post/${post.id}`); }}
+                onClick={() => {
+                  setShowMenu(false);
+                  navigate(`/post/${post.id}`);
+                }}
                 className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white hover:bg-white/5 transition-colors border-t border-[#333]"
               >
                 View Post
@@ -115,22 +131,23 @@ export default function PostCard({ post, currentUser, onDelete }) {
       {/* ── Image ── */}
       {imageUrl && (
         <div
-          className="relative w-full cursor-pointer select-none overflow-hidden rounded-sm"
+          className="relative w-full bg-black cursor-pointer select-none overflow-hidden flex items-center justify-center"
+          style={{ minHeight: "280px", maxHeight: "585px" }}
           onClick={() => navigate(`/post/${post.id}`)}
           onDoubleClick={handleDoubleTap}
         >
           <img
             src={imageUrl}
-            alt={post.caption || 'post'}
-            className="w-full object-cover block"
-            style={{ maxHeight: '585px', minHeight: '200px' }}
+            alt={post.caption || "post"}
+            className="w-full h-full object-cover block"
+            style={{ maxHeight: "585px" }}
             loading="lazy"
           />
         </div>
       )}
 
       {/* ── Actions Bar ── */}
-      <div className="px-1 pt-3 pb-1">
+      <div className="px-3 sm:px-4 pt-3 pb-2">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-4">
             {/* Like */}
@@ -142,8 +159,10 @@ export default function PostCard({ post, currentUser, onDelete }) {
             >
               <Heart
                 size={26}
-                className={`transition-transform group-hover:scale-110 ${likeAnimate ? 'like-animate' : ''} ${
-                  liked ? 'fill-red-500 text-red-500' : 'text-white hover:text-gray-400'
+                className={`transition-transform group-hover:scale-110 ${likeAnimate ? "like-animate" : ""} ${
+                  liked
+                    ? "fill-red-500 text-red-500"
+                    : "text-white hover:text-gray-400"
                 }`}
               />
             </button>
@@ -154,12 +173,18 @@ export default function PostCard({ post, currentUser, onDelete }) {
               onClick={() => navigate(`/post/${post.id}`)}
               className="group -m-1 p-1"
             >
-              <MessageCircle size={26} className="text-white hover:text-gray-400 transition-colors" />
+              <MessageCircle
+                size={26}
+                className="text-white hover:text-gray-400 transition-colors"
+              />
             </button>
 
             {/* Share / Send */}
             <button className="group -m-1 p-1">
-              <Send size={24} className="text-white hover:text-gray-400 transition-colors -rotate-12" />
+              <Send
+                size={24}
+                className="text-white hover:text-gray-400 transition-colors -rotate-12"
+              />
             </button>
           </div>
 
@@ -172,7 +197,9 @@ export default function PostCard({ post, currentUser, onDelete }) {
             <Bookmark
               size={26}
               className={`transition-transform group-hover:scale-110 ${
-                saved ? 'fill-white text-white' : 'text-white hover:text-gray-400'
+                saved
+                  ? "fill-white text-white"
+                  : "text-white hover:text-gray-400"
               }`}
             />
           </button>
@@ -181,7 +208,7 @@ export default function PostCard({ post, currentUser, onDelete }) {
         {/* Like count */}
         {likeCount > 0 && (
           <p className="text-sm font-semibold text-white mb-1">
-            {likeCount.toLocaleString()} {likeCount === 1 ? 'like' : 'likes'}
+            {likeCount.toLocaleString()} {likeCount === 1 ? "like" : "likes"}
           </p>
         )}
 
@@ -204,7 +231,10 @@ export default function PostCard({ post, currentUser, onDelete }) {
         )}
 
         {/* Timestamp small */}
-        <TimeAgo date={post.created_at} className="text-[11px] text-gray-600 uppercase tracking-wide mt-2 block" />
+        <TimeAgo
+          date={post.created_at}
+          className="text-[11px] text-gray-600 uppercase tracking-wide mt-2 block"
+        />
       </div>
     </article>
   );

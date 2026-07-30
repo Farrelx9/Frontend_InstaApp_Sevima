@@ -133,7 +133,7 @@ export default function Navbar() {
       {/* MOBILE TOP BAR (< 768px)                                   */}
       {/* ========================================================= */}
       <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[#000]/95 backdrop-blur-xl border-b border-white/10">
-        <div className="max-w-[470px] mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="max-w-[470px] mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" id="mobile-top-logo" className="flex items-center gap-2">
             <div className="p-1.5 rounded-lg animated-gradient">
               <InstagramLogo size={18} className="text-white" />
@@ -161,7 +161,7 @@ export default function Navbar() {
       {/* MOBILE BOTTOM NAV (< 768px)                                */}
       {/* ========================================================= */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#000]/95 backdrop-blur-xl border-t border-white/10">
-        <div className="max-w-[470px] mx-auto h-16 flex items-center justify-around px-4">
+        <div className="max-w-[470px] mx-auto h-16 flex items-center justify-around px-6">
           <Link
             to="/"
             className={`p-2 transition-all ${isActive("/") ? "text-white" : "text-gray-600"}`}

@@ -19,13 +19,18 @@ function AppLayout({ children }) {
       {/* Left sidebar (fixed) */}
       <Navbar />
 
-      {/* Main content area — offset dari sidebar kiri */}
-      {/* Mobile: full width dengan padding top/bottom */}
-      {/* Desktop (md+): margin kiri 72px, konten terpusat */}
+      {/* Main content area */}
+      {/* Mobile: full width, offset top dari header (56px) + bottom nav (64px) */}
+      {/* Tablet (sm): sama seperti mobile tapi sedikit lebih lapang */}
+      {/* Desktop (md+): margin kiri 72px sidebar, padding cukup */}
       <div className="flex-1 md:ml-[72px]">
         <div className="w-full flex justify-center">
-          {/* Inner container: max 935px sesuai Instagram, padding kiri-kanan */}
-          <div className="w-full max-w-[935px] px-4 pt-16 pb-20 md:pt-8 md:pb-10">
+          <div
+            className="w-full max-w-[935px]
+            px-3 sm:px-4 md:px-6
+            pt-[64px] pb-[80px]
+            md:pt-8 md:pb-10"
+          >
             {children}
           </div>
         </div>
@@ -35,12 +40,18 @@ function AppLayout({ children }) {
       <div className="hidden md:flex fixed bottom-5 right-5 z-40 bg-[#1a1a1a] border border-white/10 hover:border-white/20 rounded-full px-5 py-3 items-center gap-3 shadow-2xl cursor-pointer hover:bg-[#222] transition-all group select-none">
         <div className="relative">
           <MessageSquare size={18} className="text-white" />
-          <span className="absolute -top-1.5 -right-1.5 bg-pink-500 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full">5</span>
+          <span className="absolute -top-1.5 -right-1.5 bg-pink-500 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
+            5
+          </span>
         </div>
         <span className="text-sm font-semibold text-white">Messages</span>
         <div className="flex -space-x-1.5">
-          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-rose-400 border-2 border-[#1a1a1a] flex items-center justify-center text-[9px] font-bold text-white">F</div>
-          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-indigo-400 border-2 border-[#1a1a1a] flex items-center justify-center text-[9px] font-bold text-white">A</div>
+          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-rose-400 border-2 border-[#1a1a1a] flex items-center justify-center text-[9px] font-bold text-white">
+            F
+          </div>
+          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-indigo-400 border-2 border-[#1a1a1a] flex items-center justify-center text-[9px] font-bold text-white">
+            A
+          </div>
         </div>
       </div>
     </div>
@@ -76,10 +87,46 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/" element={<ProtectedRoute><AppLayout><HomePage /></AppLayout></ProtectedRoute>} />
-          <Route path="/create" element={<ProtectedRoute><AppLayout><CreatePostPage /></AppLayout></ProtectedRoute>} />
-          <Route path="/post/:id" element={<ProtectedRoute><AppLayout><PostDetailPage /></AppLayout></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><AppLayout><ProfilePage /></AppLayout></ProtectedRoute>} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <HomePage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/create"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <CreatePostPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/post/:id"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <PostDetailPage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <ProfilePage />
+                </AppLayout>
+              </ProtectedRoute>
+            }
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

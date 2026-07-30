@@ -68,16 +68,16 @@ export default function HomePage() {
       - Right sidebar: fixed width ~320px, appears on lg+ screens
       - Gap between them: ~28px (Instagram uses ~56px total padding)
     */
-    <div className="flex gap-7 justify-center items-start">
+    <div className="flex gap-8 justify-center items-start">
 
-      {/* ─── FEED COLUMN (470px fixed width) ─── */}
-      <div className="w-full max-w-[470px] flex-shrink-0">
+      {/* ─── FEED COLUMN ─── */}
+      <div className="w-full max-w-[470px] flex-shrink-0 min-w-0">
 
         {/* Stories */}
         <StoriesBar />
 
         {/* Post cards */}
-        <div className="mt-4 space-y-0">
+        <div className="mt-2 divide-y divide-[#262626]">
           {posts.length === 0 ? (
             <div className="border border-white/10 rounded-xl p-16 text-center mt-8">
               <p className="text-4xl mb-3">📷</p>

@@ -11,9 +11,9 @@ const FAKE_STORIES = [
 
 export default function StoriesBar() {
   return (
-    <div className="border border-[#262626] rounded-sm bg-[#000] py-4 px-2 mb-3">
+    <div className="border border-[#262626] rounded-xl bg-[#000] py-4 px-3 mb-4">
       <div
-        className="flex gap-5 overflow-x-auto"
+        className="flex gap-4 overflow-x-auto"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {/* Your story */}

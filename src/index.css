@@ -1,9 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+img {
+  display: block;
+  max-width: 100%;
 }
 
 body {
@@ -11,6 +18,8 @@ body {
   background-color: #0a0a0a;
   color: #ffffff;
   min-height: 100vh;
+  min-height: 100dvh;   /* dynamic viewport height for mobile */
+  overscroll-behavior: none;
 }
 
 :root {
@@ -19,6 +28,11 @@ body {
   --glass-border: rgba(255, 255, 255, 0.1);
   --card-bg: #1a1a1a;
   --surface: #111111;
+
+  /* Navbar heights */
+  --mobile-top-h: 64px;
+  --mobile-bottom-h: 64px;
+  --desktop-sidebar-w: 72px;
 }
 
 /* Scrollbar */
