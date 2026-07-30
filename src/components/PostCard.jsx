@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Heart,
-  MessageCircle,
-  Bookmark,
-  MoreHorizontal,
-  Trash2,
-  Send,
-} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Heart, MessageCircle, Bookmark, MoreHorizontal, Trash2, Send } from "lucide-react";
 import { toggleLike, deletePost } from "../services/api";
 import toast from "react-hot-toast";
 import Avatar from "./Avatar";
@@ -16,14 +10,12 @@ import { getImageUrl } from "../utils/image";
 
 export default function PostCard({ post, currentUser, onDelete }) {
   const navigate = useNavigate();
-  const [liked, setLiked] = useState(
-    post.likes?.some((l) => l.user_id === currentUser?.id) || false,
-  );
+  const [liked, setLiked] = useState(post.likes?.some((l) => l.user_id === currentUser?.id) || false);
   const [likeCount, setLikeCount] = useState(post.likes?.length || 0);
   const [likeLoading, setLikeLoading] = useState(false);
-  const [likeAnimate, setLikeAnimate] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [showBigHeart, setShowBigHeart] = useState(false);
 
   const imageUrl = getImageUrl(post);
 
@@ -34,22 +26,22 @@ export default function PostCard({ post, currentUser, onDelete }) {
     setLikeLoading(true);
     const wasLiked = liked;
     setLiked(!wasLiked);
-    setLikeCount((prev) => (wasLiked ? prev - 1 : prev + 1));
-    setLikeAnimate(true);
-    setTimeout(() => setLikeAnimate(false), 300);
+    setLikeCount((p) => (wasLiked ? p - 1 : p + 1));
     try {
       await toggleLike(post.id);
     } catch {
       setLiked(wasLiked);
-      setLikeCount((prev) => (wasLiked ? prev + 1 : prev - 1));
+      setLikeCount((p) => (wasLiked ? p + 1 : p - 1));
     } finally {
       setLikeLoading(false);
     }
   };
 
   const handleDoubleTap = () => {
-    if (!currentUser || liked) return;
-    handleLike();
+    if (!currentUser) return;
+    if (!liked) handleLike();
+    setShowBigHeart(true);
+    setTimeout(() => setShowBigHeart(false), 700);
   };
 
   const handleDelete = async (e) => {
@@ -68,71 +60,69 @@ export default function PostCard({ post, currentUser, onDelete }) {
   const commentCount = post.comments_count ?? post.comments?.length ?? 0;
 
   return (
-    <article className="bg-[#000] border-b border-[#262626] pb-2">
-      {/* ── Post Header ── */}
-      <div className="flex items-center justify-between px-3 sm:px-4 py-3">
-        <div className="flex items-center gap-3 cursor-pointer">
-          {/* Avatar with gradient ring */}
-          <div className="p-[2px] rounded-full bg-gradient-to-bl from-yellow-400 via-pink-500 to-purple-600">
-            <div className="bg-[#000] rounded-full p-[2px]">
+    <article className="
+      bg-black border border-[#262626] rounded-2xl overflow-hidden
+      card-hover
+    ">
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between px-4 py-3">
+        <button
+          onClick={() => navigate("/profile")}
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+        >
+          <div className="p-[2.5px] rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 shrink-0">
+            <div className="bg-black rounded-full p-[2px]">
               <Avatar name={post.user?.name} size="md" />
             </div>
           </div>
-          <div>
-            <p className="text-white font-semibold text-sm leading-tight">
-              {post.user?.name}
-            </p>
-            <div className="flex items-center gap-1">
-              <TimeAgo
-                date={post.created_at}
-                className="text-gray-400 text-xs"
-              />
-            </div>
+          <div className="text-left">
+            <p className="text-white font-semibold text-sm leading-tight">{post.user?.name}</p>
+            <TimeAgo date={post.created_at} className="text-[#737373] text-xs" />
           </div>
-        </div>
+        </button>
 
-        {/* Three dot menu */}
+        {/* Menu */}
         <div className="relative">
           <button
             id={`post-menu-${post.id}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowMenu(!showMenu);
-            }}
-            className="p-2 text-gray-400 hover:text-white transition-colors"
+            onClick={(e) => { e.stopPropagation(); setShowMenu(!showMenu); }}
+            className="p-2 text-[#a8a8a8] hover:text-white transition-colors rounded-full hover:bg-white/8"
           >
             <MoreHorizontal size={20} />
           </button>
-          {showMenu && (
-            <div className="absolute right-0 top-10 bg-[#1c1c1c] border border-[#333] rounded-2xl shadow-2xl overflow-hidden z-20 w-40">
-              {currentUser?.id === post.user_id && (
-                <button
-                  id={`delete-post-${post.id}`}
-                  onClick={handleDelete}
-                  className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-red-400 hover:bg-red-500/10 font-semibold transition-colors"
-                >
-                  <Trash2 size={15} /> Delete
-                </button>
-              )}
-              <button
-                onClick={() => {
-                  setShowMenu(false);
-                  navigate(`/post/${post.id}`);
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white hover:bg-white/5 transition-colors border-t border-[#333]"
+
+          <AnimatePresence>
+            {showMenu && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: -6 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: -6 }}
+                transition={{ duration: 0.15 }}
+                className="absolute right-0 top-10 w-44 bg-[#1a1a1a] border border-[#303030] rounded-2xl shadow-2xl overflow-hidden z-30"
               >
-                View Post
-              </button>
-            </div>
-          )}
+                {currentUser?.id === post.user_id ? (
+                  <button
+                    id={`delete-post-${post.id}`}
+                    onClick={handleDelete}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#ed4956] hover:bg-[#ed4956]/10 font-semibold transition-colors"
+                  >
+                    <Trash2 size={15} /> Delete Post
+                  </button>
+                ) : (
+                  <div className="px-4 py-3 text-xs text-[#737373] text-center">
+                    No options available
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
-      {/* ── Image ── */}
+      {/* ── Media — 1:1 square (consistent with Instagram) ── */}
       {imageUrl && (
         <div
-          className="relative w-full bg-black cursor-pointer select-none overflow-hidden flex items-center justify-center"
-          style={{ minHeight: "280px", maxHeight: "585px" }}
+          className="relative w-full aspect-square bg-[#050505] select-none cursor-pointer overflow-hidden"
           onClick={() => navigate(`/post/${post.id}`)}
           onDoubleClick={handleDoubleTap}
         >
@@ -140,100 +130,106 @@ export default function PostCard({ post, currentUser, onDelete }) {
             src={imageUrl}
             alt={post.caption || "post"}
             className="w-full h-full object-cover block"
-            style={{ maxHeight: "585px" }}
             loading="lazy"
           />
+
+          {/* Double-tap heart */}
+          <AnimatePresence>
+            {showBigHeart && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.3 }}
+                animate={{ opacity: 1, scale: 1.1 }}
+                exit={{ opacity: 0, scale: 1.4 }}
+                transition={{ duration: 0.32 }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+              >
+                <Heart size={90} className="fill-white text-white drop-shadow-2xl" />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       )}
 
-      {/* ── Actions Bar ── */}
-      <div className="px-3 sm:px-4 pt-3 pb-2">
-        <div className="flex items-center justify-between mb-2">
+      {/* ── Actions ── */}
+      <div className="px-4 pt-3 pb-4">
+        <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-4">
             {/* Like */}
-            <button
+            <motion.button
               id={`like-btn-${post.id}`}
               onClick={handleLike}
-              className="group -m-1 p-1"
-              aria-label="Like post"
+              whileTap={{ scale: 0.78 }}
+              animate={liked ? { scale: [1, 1.28, 1] } : { scale: 1 }}
+              transition={{ duration: 0.28 }}
+              className="focus:outline-none"
+              aria-label="Like"
             >
               <Heart
                 size={26}
-                className={`transition-transform group-hover:scale-110 ${likeAnimate ? "like-animate" : ""} ${
-                  liked
-                    ? "fill-red-500 text-red-500"
-                    : "text-white hover:text-gray-400"
-                }`}
+                className={`transition-colors duration-150 ${liked ? "fill-[#ed4956] text-[#ed4956]" : "text-white hover:text-[#a8a8a8]"}`}
               />
-            </button>
+            </motion.button>
 
             {/* Comment */}
             <button
               id={`comment-btn-${post.id}`}
               onClick={() => navigate(`/post/${post.id}`)}
-              className="group -m-1 p-1"
+              aria-label="Comment"
             >
-              <MessageCircle
-                size={26}
-                className="text-white hover:text-gray-400 transition-colors"
-              />
+              <MessageCircle size={26} className="text-white hover:text-[#a8a8a8] transition-colors duration-150" />
             </button>
 
-            {/* Share / Send */}
-            <button className="group -m-1 p-1">
-              <Send
-                size={24}
-                className="text-white hover:text-gray-400 transition-colors -rotate-12"
-              />
+            {/* Share */}
+            <button
+              onClick={() => toast("Copied to clipboard!", { icon: "📋" })}
+              aria-label="Share"
+            >
+              <Send size={24} className="text-white hover:text-[#a8a8a8] transition-colors duration-150 -rotate-12" />
             </button>
           </div>
 
-          {/* Bookmark */}
-          <button
+          {/* Save */}
+          <motion.button
             id={`save-btn-${post.id}`}
             onClick={() => setSaved(!saved)}
-            className="group -m-1 p-1"
+            whileTap={{ scale: 0.78 }}
+            aria-label="Save"
           >
             <Bookmark
               size={26}
-              className={`transition-transform group-hover:scale-110 ${
-                saved
-                  ? "fill-white text-white"
-                  : "text-white hover:text-gray-400"
-              }`}
+              className={`transition-colors duration-150 ${saved ? "fill-white text-white" : "text-white hover:text-[#a8a8a8]"}`}
             />
-          </button>
+          </motion.button>
         </div>
 
         {/* Like count */}
         {likeCount > 0 && (
-          <p className="text-sm font-semibold text-white mb-1">
+          <p className="text-sm font-semibold text-white mb-1.5">
             {likeCount.toLocaleString()} {likeCount === 1 ? "like" : "likes"}
           </p>
         )}
 
         {/* Caption */}
         {post.caption && (
-          <p className="text-sm text-white leading-snug">
+          <p className="text-sm text-[#f5f5f5] leading-snug">
             <span className="font-semibold mr-1.5">{post.user?.name}</span>
-            <span className="text-gray-200 font-normal">{post.caption}</span>
+            <span className="text-[#d4d4d4] font-normal">{post.caption}</span>
           </p>
         )}
 
-        {/* View all comments */}
+        {/* View comments */}
         {commentCount > 0 && (
           <button
             onClick={() => navigate(`/post/${post.id}`)}
-            className="text-sm text-gray-500 mt-1 hover:text-gray-300 transition-colors block"
+            className="text-sm text-[#737373] hover:text-[#a8a8a8] transition-colors mt-1 block"
           >
             View all {commentCount} comments
           </button>
         )}
 
-        {/* Timestamp small */}
         <TimeAgo
           date={post.created_at}
-          className="text-[11px] text-gray-600 uppercase tracking-wide mt-2 block"
+          className="text-[11px] text-[#737373] uppercase tracking-wider mt-2 block"
         />
       </div>
     </article>

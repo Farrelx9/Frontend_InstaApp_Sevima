@@ -9,50 +9,102 @@ import HomePage from "./pages/HomePage";
 import CreatePostPage from "./pages/CreatePostPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import ProfilePage from "./pages/ProfilePage";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 import "./App.css";
 
-// AppLayout: Sidebar kiri slim (72px) + main content terpusat
+/**
+ * AppLayout — Perfect Viewport Centering & Dynamic Collapsible Sidebar
+ *
+ * Mobile (<640px): Full width, top bar + bottom nav
+ * Tablet & Desktop (>=640px): Sidebar offset (72px collapsed / 240px expanded)
+ * Main Content: Perfectly centered in remaining canvas space!
+ */
 function AppLayout({ children }) {
-  return (
-    <div className="flex min-h-screen bg-[#000]">
-      {/* Left sidebar (fixed) */}
-      <Navbar />
+  const [showChat, setShowChat] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-      {/* Main content area */}
-      {/* Mobile: full width, offset top dari header (56px) + bottom nav (64px) */}
-      {/* Tablet (sm): sama seperti mobile tapi sedikit lebih lapang */}
-      {/* Desktop (md+): margin kiri 72px sidebar, padding cukup */}
-      <div className="flex-1 md:ml-[72px]">
-        <div className="w-full flex justify-center">
-          <div
-            className="w-full max-w-[935px]
-            px-3 sm:px-4 md:px-6
-            pt-[64px] pb-[80px]
-            md:pt-8 md:pb-10"
-          >
-            {children}
-          </div>
-        </div>
+  return (
+    <div className="flex min-h-screen bg-black text-[#f5f5f5] overflow-x-hidden relative">
+      {/* ── Collapsible Left Sidebar Navigation ── */}
+      <Navbar
+        isCollapsed={isCollapsed}
+        onToggleCollapse={() => setIsCollapsed((prev) => !prev)}
+      />
+
+      {/* ── Main Canvas (Centered relative to remaining space) ── */}
+      <div
+        className={`
+          flex-1 min-w-0 w-full flex justify-center
+          ${isCollapsed ? "sm:ml-[72px]" : "sm:ml-[72px] lg:ml-[240px]"}
+          transition-all duration-300 ease-in-out
+        `}
+      >
+        {/* Centered Canvas Container */}
+        <main className="w-full max-w-[1050px] px-3 sm:px-6 pt-[60px] pb-[80px] sm:pt-6 sm:pb-8 flex justify-center">
+          <div className="w-full flex justify-center">{children}</div>
+        </main>
       </div>
 
-      {/* Floating Messages Pill */}
-      <div className="hidden md:flex fixed bottom-5 right-5 z-40 bg-[#1a1a1a] border border-white/10 hover:border-white/20 rounded-full px-5 py-3 items-center gap-3 shadow-2xl cursor-pointer hover:bg-[#222] transition-all group select-none">
-        <div className="relative">
-          <MessageSquare size={18} className="text-white" />
-          <span className="absolute -top-1.5 -right-1.5 bg-pink-500 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
-            5
-          </span>
-        </div>
-        <span className="text-sm font-semibold text-white">Messages</span>
-        <div className="flex -space-x-1.5">
-          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-rose-400 border-2 border-[#1a1a1a] flex items-center justify-center text-[9px] font-bold text-white">
-            F
+      {/* ── Floating Direct Messages Widget ── */}
+      <div className="hidden sm:block fixed bottom-5 right-4 lg:right-6 z-40">
+        <AnimatePresence>
+          {showChat && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.96 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="absolute bottom-14 right-0 w-[320px] bg-[#111] border border-[#262626] rounded-2xl p-4 shadow-2xl mb-2"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-[#262626] mb-3">
+                <div className="flex items-center gap-2">
+                  <MessageSquare size={15} className="text-[#0095f6]" />
+                  <span className="text-sm font-bold text-white">Direct Messages</span>
+                </div>
+                <button
+                  onClick={() => setShowChat(false)}
+                  className="p-1 text-[#737373] hover:text-white rounded-full hover:bg-white/10 transition-colors"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+              <div className="space-y-1">
+                {[
+                  { name: "Farrel", msg: "Hey! Great app 🔥", time: "2m", color: "from-pink-500 to-rose-400" },
+                  { name: "Andi", msg: "Check out the new design!", time: "1h", color: "from-purple-500 to-indigo-400" },
+                ].map((dm) => (
+                  <div key={dm.name} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition-colors">
+                    <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${dm.color} flex items-center justify-center font-bold text-xs text-white shrink-0`}>
+                      {dm.name[0]}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-white truncate">{dm.name}</p>
+                      <p className="text-[11px] text-[#737373] truncate">{dm.msg}</p>
+                    </div>
+                    <span className="text-[10px] text-[#737373] shrink-0">{dm.time}</span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.button
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          onClick={() => setShowChat((p) => !p)}
+          className="flex items-center gap-2.5 bg-[#111] border border-[#262626] hover:border-[#363636] rounded-full px-4 py-2.5 shadow-xl transition-all duration-200 group"
+        >
+          <div className="relative">
+            <MessageSquare size={17} className="text-white group-hover:text-[#0095f6] transition-colors" />
+            <span className="absolute -top-1 -right-1.5 w-3.5 h-3.5 bg-pink-500 text-[8px] font-black text-white flex items-center justify-center rounded-full">
+              2
+            </span>
           </div>
-          <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-500 to-indigo-400 border-2 border-[#1a1a1a] flex items-center justify-center text-[9px] font-bold text-white">
-            A
-          </div>
-        </div>
+          <span className="text-xs font-semibold text-white">Messages</span>
+        </motion.button>
       </div>
     </div>
   );
@@ -68,19 +120,15 @@ function App() {
             style: {
               background: "#1a1a1a",
               color: "#fff",
-              border: "1px solid rgba(255,255,255,0.1)",
+              border: "1px solid #262626",
               borderRadius: "12px",
-              fontSize: "14px",
+              fontSize: "13px",
+              fontWeight: "600",
               fontFamily: "Inter, sans-serif",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
             },
-            success: {
-              iconTheme: { primary: "#e6683c", secondary: "#fff" },
-              duration: 2500,
-            },
-            error: {
-              iconTheme: { primary: "#ef4444", secondary: "#fff" },
-              duration: 3000,
-            },
+            success: { iconTheme: { primary: "#0095f6", secondary: "#fff" }, duration: 2500 },
+            error: { iconTheme: { primary: "#ed4956", secondary: "#fff" }, duration: 3000 },
           }}
         />
 
