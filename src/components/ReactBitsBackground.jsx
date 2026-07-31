@@ -6,6 +6,7 @@ export default function ReactBitsBackground() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -14,88 +15,55 @@ export default function ReactBitsBackground() {
     let height = (canvas.height = canvas.offsetHeight);
 
     const handleResize = () => {
-      if (!canvas) return;
       width = canvas.width = canvas.offsetWidth;
       height = canvas.height = canvas.offsetHeight;
     };
 
     window.addEventListener("resize", handleResize);
 
-    // Color nodes representing Instagram / Aurora palette
-    const colors = [
-      { r: 236, g: 72, b: 153 }, // Pink
-      { r: 168, g: 85, b: 247 }, // Purple
-      { r: 249, g: 115, b: 22 }, // Orange
-      { r: 217, g: 70, b: 239 }, // Magenta
+    // Palet Warna Instagram yang Elegan
+    const orbs = [
+      { x: 0.2, y: 0.3, r: 0.6, color: "#ec4899", vx: 0.0008, vy: 0.0006 }, // Pink
+      { x: 0.8, y: 0.7, r: 0.5, color: "#a855f7", vx: -0.0007, vy: 0.0009 }, // Purple
+      { x: 0.5, y: 0.8, r: 0.45, color: "#f97316", vx: 0.0009, vy: -0.0005 }, // Orange
+      { x: 0.7, y: 0.2, r: 0.55, color: "#db2777", vx: -0.0006, vy: -0.0008 }, // Magenta
     ];
-
-    // Blob particles for fluid aurora wave
-    const blobs = Array.from({ length: 6 }, (_, i) => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.8,
-      vy: (Math.random() - 0.5) * 0.8,
-      radius: Math.min(width, height) * (0.35 + Math.random() * 0.25),
-      color: colors[i % colors.length],
-      phase: Math.random() * Math.PI * 2,
-    }));
 
     let time = 0;
 
     const render = () => {
-      time += 0.008;
+      time += 1;
+
+      // Base background gelap
       ctx.fillStyle = "#050508";
       ctx.fillRect(0, 0, width, height);
 
-      // Render glowing aurora blobs
-      blobs.forEach((blob, idx) => {
-        blob.x += Math.sin(time + blob.phase) * 0.6 + blob.vx;
-        blob.y += Math.cos(time + blob.phase) * 0.6 + blob.vy;
+      // Kunci efek silk: Blend mode 'screen' + Blur Ekstrem
+      ctx.globalCompositeOperation = "screen";
+      ctx.filter = "blur(100px)";
 
-        // Bounce gently inside canvas boundaries
-        if (blob.x < -100) blob.x = width + 100;
-        if (blob.x > width + 100) blob.x = -100;
-        if (blob.y < -100) blob.y = height + 100;
-        if (blob.y > height + 100) blob.y = -100;
+      orbs.forEach((orb, i) => {
+        // Gerakan sangat lambat dan mengalir
+        const moveX = Math.sin(time * orb.vx + i) * width * 0.2;
+        const moveY = Math.cos(time * orb.vy + i * 1.5) * height * 0.2;
 
-        const pulseRadius = blob.radius + Math.sin(time * 1.5 + idx) * 30;
+        const cx = width * orb.x + moveX;
+        const cy = height * orb.y + moveY;
+        const radius = Math.min(width, height) * orb.r;
 
-        const gradient = ctx.createRadialGradient(
-          blob.x,
-          blob.y,
-          0,
-          blob.x,
-          blob.y,
-          pulseRadius
-        );
-
-        const { r, g, b } = blob.color;
-        gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.35)`);
-        gradient.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, 0.12)`);
-        gradient.addColorStop(1, "rgba(5, 5, 8, 0)");
+        const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+        gradient.addColorStop(0, orb.color);
+        gradient.addColorStop(1, "transparent");
 
         ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(blob.x, blob.y, pulseRadius, 0, Math.PI * 2);
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Overlay subtle wave grid lines (ReactBits aesthetic)
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
-      ctx.lineWidth = 1;
-      const step = 40;
-      for (let x = 0; x < width; x += step) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-      for (let y = 0; y < height; y += step) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
+      // Reset filter agar tidak mempengaruhi elemen lain jika ada
+      ctx.filter = "none";
+      ctx.globalCompositeOperation = "source-over";
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -109,10 +77,20 @@ export default function ReactBitsBackground() {
   }, []);
 
   return (
-    <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
+    <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none bg-[#050508]">
       <canvas ref={canvasRef} className="w-full h-full block" />
-      {/* Soft overlay gradient for contrast */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#050508] via-transparent to-[#050508]/40" />
+
+      {/* Noise overlay elegan menggunakan SVG (bukan pixel manipulation) */}
+      {/* Opacity 0.04 cukup untuk memberi tekstur tanpa membuatnya kasar */}
+      <div
+        className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      {/* Vignette untuk memfokuskan perhatian ke tengah */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#050508_80%)]" />
     </div>
   );
 }
