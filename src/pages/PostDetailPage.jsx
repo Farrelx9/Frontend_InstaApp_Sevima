@@ -118,7 +118,7 @@ export default function PostDetailPage() {
     if (!commentToDelete) return;
     setIsDeletingComment(true);
     try {
-      await deleteComment(id, commentToDelete);
+      await deleteComment(commentToDelete);
       setComments((prev) => prev.filter((c) => c.id !== commentToDelete));
       toast.success("Comment deleted");
     } catch {
