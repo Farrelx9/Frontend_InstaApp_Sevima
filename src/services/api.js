@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8000/api";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -32,20 +32,20 @@ export const createPost = (data) =>
     headers: { "Content-Type": "multipart/form-data" },
   });
 export const deletePost = (id) => api.delete(`/posts/${id}`);
+
 // Posts by User
 export const getUserPosts = (userId) => api.get(`/users/${userId}/posts`);
 
-//Comments
+// Comments
 export const getComments = (postId) => api.get(`/posts/${postId}/comments`);
 export const createComment = (postId, data) =>
   api.post(`/posts/${postId}/comments`, data);
-
 export const deleteComment = (commentId) =>
   api.delete(`/comments/${commentId}`);
-
 export const updateComment = (commentId, body) =>
   api.put(`/comments/${commentId}`, { body });
 
 // Likes
 export const toggleLike = (postId) => api.post(`/posts/${postId}/like`);
+
 export default api;
