@@ -21,13 +21,20 @@ export default function ReactBitsBackground() {
 
     window.addEventListener("resize", handleResize);
 
-    // Palet Warna Instagram yang Elegan
     const orbs = [
-      { x: 0.2, y: 0.3, r: 0.6, color: "#ec4899", vx: 0.0008, vy: 0.0006 }, // Pink
-      { x: 0.8, y: 0.7, r: 0.5, color: "#a855f7", vx: -0.0007, vy: 0.0009 }, // Purple
-      { x: 0.5, y: 0.8, r: 0.45, color: "#f97316", vx: 0.0009, vy: -0.0005 }, // Orange
-      { x: 0.7, y: 0.2, r: 0.55, color: "#db2777", vx: -0.0006, vy: -0.0008 }, // Magenta
+      { x: 0.2, y: 0.3, r: 0.6, color: "#ec4899", vx: 0.0008, vy: 0.0006 },
+      { x: 0.8, y: 0.7, r: 0.5, color: "#a855f7", vx: -0.0007, vy: 0.0009 },
+      { x: 0.5, y: 0.8, r: 0.45, color: "#f97316", vx: 0.0009, vy: -0.0005 },
+      { x: 0.7, y: 0.2, r: 0.55, color: "#db2777", vx: -0.0006, vy: -0.0008 },
     ];
+
+    const particles = Array.from({ length: 40 }, () => ({
+      x: Math.random(),
+      y: Math.random(),
+      r: Math.random() * 1.5 + 0.5,
+      speed: Math.random() * 0.0003 + 0.0001,
+      opacity: Math.random() * 0.4 + 0.1,
+    }));
 
     let time = 0;
 
@@ -38,12 +45,11 @@ export default function ReactBitsBackground() {
       ctx.fillStyle = "#050508";
       ctx.fillRect(0, 0, width, height);
 
-      // Kunci efek silk: Blend mode 'screen' + Blur Ekstrem
+      // Gambar orb dengan blend 'screen' + blur ekstrem
       ctx.globalCompositeOperation = "screen";
       ctx.filter = "blur(100px)";
 
       orbs.forEach((orb, i) => {
-        // Gerakan sangat lambat dan mengalir
         const moveX = Math.sin(time * orb.vx + i) * width * 0.2;
         const moveY = Math.cos(time * orb.vy + i * 1.5) * height * 0.2;
 
@@ -61,9 +67,17 @@ export default function ReactBitsBackground() {
         ctx.fill();
       });
 
-      // Reset filter agar tidak mempengaruhi elemen lain jika ada
+      // Reset filter/blend sebelum gambar particles (biar particles tetap tajam)
       ctx.filter = "none";
       ctx.globalCompositeOperation = "source-over";
+
+      particles.forEach((p) => {
+        const py = (p.y + time * p.speed) % 1;
+        ctx.beginPath();
+        ctx.arc(width * p.x, height * py, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+        ctx.fill();
+      });
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -80,8 +94,6 @@ export default function ReactBitsBackground() {
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none bg-[#050508]">
       <canvas ref={canvasRef} className="w-full h-full block" />
 
-      {/* Noise overlay elegan menggunakan SVG (bukan pixel manipulation) */}
-      {/* Opacity 0.04 cukup untuk memberi tekstur tanpa membuatnya kasar */}
       <div
         className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none"
         style={{
@@ -89,7 +101,6 @@ export default function ReactBitsBackground() {
         }}
       />
 
-      {/* Vignette untuk memfokuskan perhatian ke tengah */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#050508_80%)]" />
     </div>
   );
