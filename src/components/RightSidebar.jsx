@@ -105,16 +105,11 @@ export default function RightSidebar({ user }) {
       <div className="space-y-3 pt-2 border-t border-[#1a1a1a]">
         <p className="text-[11px] text-[#737373] leading-relaxed flex flex-wrap gap-x-1">
           {[
-            "About",
-            "Help",
-            "Press",
-            "API",
-            "Jobs",
-            "Privacy",
-            "Terms",
-            "Locations",
-            "Language",
-            "Meta Verified",
+            "Software Engineer Intern",
+            "Developer",
+            "Sistem Informasi",
+            "Universitas Pembangunan Nasional Veteran Jawa Timur",
+            "Sevima Verified!",
           ].map((item, i, arr) => (
             <span key={item}>
               {item}
@@ -122,7 +117,9 @@ export default function RightSidebar({ user }) {
             </span>
           ))}
         </p>
-        <p className="text-[11px] text-[#737373]">© 2026 Instagram from Meta</p>
+        <p className="text-[11px] text-[#737373]">
+          © 2026 Farrel Farhan. All rights reserved.
+        </p>
       </div>
     </aside>
   );

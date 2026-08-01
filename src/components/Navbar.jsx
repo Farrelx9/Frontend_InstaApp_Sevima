@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
   PlusSquare,
@@ -32,6 +32,7 @@ export default function Navbar({ isCollapsed, onToggleCollapse }) {
   const { user, logout } = useAuth();
   const [tooltip, setTooltip] = useState(null);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const navigate = useNavigate();
 
   // State untuk Modal Konfirmasi Sign Out
   const [showSignOutModal, setShowSignOutModal] = useState(false);
@@ -46,6 +47,7 @@ export default function Navbar({ isCollapsed, onToggleCollapse }) {
     setShowSignOutModal(false);
     await logout();
     toast.success("Signed out successfully");
+    navigate("/login", { replace: true });
   };
 
   const handleNotif = () => toast("No new notifications", { icon: "🔔" });
