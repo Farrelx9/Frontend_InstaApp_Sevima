@@ -63,99 +63,119 @@ export default function ProfilePage() {
     fetchData();
   }, [profileUserId, user, isOwnProfile]);
 
-  if (!displayUser || !user) return null;
+  // Jangan render apa-apa sampai displayUser siap (kecuali loading, skeleton butuh ini)
+  if (!displayUser && !loading) return null;
 
   const totalLikes = userPosts.reduce(
     (acc, p) => acc + (p.likes?.length || 0),
     0,
   );
 
-  const username = displayUser.email
+  const username = displayUser?.email
     ? displayUser.email.split("@")[0]
-    : displayUser.name.toLowerCase().replace(/\s+/g, "");
+    : displayUser?.name.toLowerCase().replace(/\s+/g, "") || "";
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      // ✅ PERBAIKAN 1: Lebar container diperbesar ke max-w-[935px] (standar IG)
       className="w-full max-w-[935px] mx-auto py-8 px-4 sm:px-6"
     >
-      {/* PROFILE HEADER */}
-      <header className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-10 pb-8 border-b border-[#262626] mb-8">
-        {/* Avatar */}
-        <div className="shrink-0">
-          <div className="p-[3px] rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 shadow-xl">
-            <div className="bg-black rounded-full p-1">
-              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-[#1a1a1a] flex items-center justify-center shadow-inner">
-                <span className="text-4xl sm:text-5xl font-black text-white uppercase select-none">
-                  {displayUser.name?.charAt(0)}
-                </span>
+      {/* ✅ SKELETON / REAL HEADER */}
+      {loading ? (
+        <header className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-10 pb-8 border-b border-[#262626] mb-8">
+          {/* Skeleton Avatar */}
+          <div className="shrink-0 w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-[#1a1a1a] animate-pulse" />
+
+          {/* Skeleton Details */}
+          <div className="flex-1 min-w-0 w-full text-center sm:text-left space-y-4">
+            <div className="flex flex-col sm:flex-row items-center gap-3 justify-center sm:justify-start">
+              <div className="h-7 w-32 bg-[#1a1a1a] rounded-md animate-pulse" />
+              <div className="h-8 w-24 bg-[#1a1a1a] rounded-xl animate-pulse mt-2 sm:mt-0" />
+            </div>
+
+            <div className="flex justify-center sm:justify-start gap-6 pt-1">
+              <div className="h-4 w-16 bg-[#1a1a1a] rounded animate-pulse" />
+              <div className="h-4 w-16 bg-[#1a1a1a] rounded animate-pulse" />
+              <div className="h-4 w-24 bg-[#1a1a1a] rounded animate-pulse" />
+            </div>
+
+            <div className="space-y-2 pt-2">
+              <div className="h-4 w-40 bg-[#1a1a1a] rounded animate-pulse mx-auto sm:mx-0" />
+              <div className="h-3 w-48 bg-[#1a1a1a] rounded animate-pulse mx-auto sm:mx-0" />
+            </div>
+          </div>
+        </header>
+      ) : (
+        <header className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-10 pb-8 border-b border-[#262626] mb-8">
+          <div className="shrink-0">
+            <div className="p-[3px] rounded-full bg-gradient-to-tr from-yellow-400 via-pink-500 to-purple-600 shadow-xl">
+              <div className="bg-black rounded-full p-1">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-[#1a1a1a] flex items-center justify-center shadow-inner">
+                  <span className="text-4xl sm:text-5xl font-black text-white uppercase select-none">
+                    {displayUser.name?.charAt(0)}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Details */}
-        <div className="flex-1 min-w-0 w-full text-center sm:text-left space-y-4">
-          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 flex-wrap justify-center sm:justify-start">
-            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              {username}
-            </h1>
+          <div className="flex-1 min-w-0 w-full text-center sm:text-left space-y-4">
+            <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 flex-wrap justify-center sm:justify-start">
+              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                {username}
+              </h1>
 
-            {isOwnProfile && (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => navigate("/create")}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-white/10 hover:bg-white/15 text-white text-xs font-semibold rounded-xl transition-colors duration-200"
-                >
-                  <Plus size={15} />
-                  <span>New Post</span>
+              {isOwnProfile && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => navigate("/create")}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-white/10 hover:bg-white/15 text-white text-xs font-semibold rounded-xl transition-colors duration-200"
+                  >
+                    <Plus size={15} />
+                    <span>New Post</span>
+                  </button>
+                </div>
+              )}
+
+              {!isOwnProfile && (
+                <button className="px-6 py-2 bg-[#0095f6] hover:bg-[#1877f2] text-white text-xs font-bold rounded-xl transition-colors">
+                  Follow
                 </button>
+              )}
+            </div>
+
+            <div className="flex justify-center sm:justify-start gap-6 sm:gap-8 text-sm pt-1">
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-white text-base">
+                  {userPosts.length}
+                </span>
+                <span className="text-[#a8a8a8]">posts</span>
               </div>
-            )}
-
-            {!isOwnProfile && (
-              <button className="px-6 py-2 bg-[#0095f6] hover:bg-[#1877f2] text-white text-xs font-bold rounded-xl transition-colors">
-                Follow
-              </button>
-            )}
-          </div>
-
-          {/* Stats Row */}
-          <div className="flex justify-center sm:justify-start gap-6 sm:gap-8 text-sm pt-1">
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-white text-base">
-                {userPosts.length}
-              </span>
-              <span className="text-[#a8a8a8]">posts</span>
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-white text-base">
+                  {totalLikes}
+                </span>
+                <span className="text-[#a8a8a8]">likes</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-white text-base">0</span>
+                <span className="text-[#a8a8a8]">followers</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-white text-base">
-                {totalLikes}
-              </span>
-              <span className="text-[#a8a8a8]">likes</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-emerald-400 text-base">
-                Active
-              </span>
-              <span className="text-[#a8a8a8]">account</span>
+
+            <div className="space-y-0.5 text-center sm:text-left">
+              <p className="font-semibold text-white text-sm">
+                {displayUser.name}
+              </p>
+              {isOwnProfile && (
+                <p className="text-xs text-[#a8a8a8]">{displayUser.email}</p>
+              )}
             </div>
           </div>
-
-          {/* Bio Info */}
-          <div className="space-y-0.5 text-center sm:text-left">
-            <p className="font-semibold text-white text-sm">
-              {displayUser.name}
-            </p>
-            {isOwnProfile && (
-              <p className="text-xs text-[#a8a8a8]">{displayUser.email}</p>
-            )}
-          </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* NAVIGATION TABS */}
       <div className="flex justify-center gap-10 sm:gap-14 border-b border-[#262626] mb-6">
@@ -183,10 +203,15 @@ export default function ProfilePage() {
         })}
       </div>
 
-      {/* POSTS GRID */}
+      {/* ✅ SKELETON / REAL GRID */}
       {loading ? (
-        <div className="flex justify-center py-16">
-          <div className="spinner" />
+        <div className="grid grid-cols-3 gap-1">
+          {[...Array(9)].map((_, i) => (
+            <div
+              key={i}
+              className="aspect-square bg-[#1a1a1a] rounded-sm animate-pulse"
+            />
+          ))}
         </div>
       ) : activeTab !== "posts" ? (
         <div className="py-16 text-center text-[#737373] text-sm font-medium">
@@ -214,7 +239,6 @@ export default function ProfilePage() {
           )}
         </div>
       ) : (
-        // ✅ PERBAIKAN 2: Grid lebih rapat (gap-1) dan tanpa border/radius per item
         <div className="grid grid-cols-3 gap-1">
           {userPosts.map((post) => {
             const img = getImageUrl(post);
@@ -222,7 +246,6 @@ export default function ProfilePage() {
               <button
                 key={post.id}
                 onClick={() => navigate(`/post/${post.id}`)}
-                // Hapus rounded-2xl, border, dan bg-[#111] agar terlihat seamless
                 className="aspect-square relative group overflow-hidden focus:outline-none"
               >
                 {img ? (
@@ -238,7 +261,6 @@ export default function ProfilePage() {
                   </div>
                 )}
 
-                {/* Hover overlay stats */}
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-6 text-white font-bold">
                   <span className="flex items-center gap-1.5 text-sm drop-shadow-md">
                     <Heart size={20} className="fill-white text-white" />
