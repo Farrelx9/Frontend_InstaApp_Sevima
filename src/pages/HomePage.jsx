@@ -37,9 +37,7 @@ export default function HomePage() {
       })
       .catch((e) => console.error(e))
       .finally(() => {
-        if (!ignore) {
-          setInitialLoad(false);
-        }
+        if (!ignore) setInitialLoad(false);
       });
     return () => {
       ignore = true;
@@ -60,52 +58,68 @@ export default function HomePage() {
     }
   };
 
-  const handleDelete = (id) => setPosts((p) => p.filter((post) => post.id !== id));
+  const handleDelete = (id) =>
+    setPosts((p) => p.filter((post) => post.id !== id));
 
-  /* ─── Skeleton Loading ─── */
+  /* ── Skeleton Loading (DIPERBAIKI) ─── */
   if (initialLoad) {
     return (
-      <div className="w-full flex justify-center pt-2">
-        <div className="flex items-start justify-center gap-8 w-full max-w-[985px]">
-          <div className="w-full max-w-[630px] shrink-0 space-y-4">
-            <div className="flex gap-4 border border-[#262626] rounded-2xl bg-black p-4 animate-pulse">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="flex flex-col items-center gap-2 shrink-0">
-                  <div className="w-14 h-14 rounded-full bg-white/10" />
-                  <div className="w-10 h-2 rounded bg-white/10" />
-                </div>
-              ))}
+      // STRUKTUR SAMA PERSIS DENGAN FEED ASLI
+      <div className="w-full min-h-screen flex justify-center bg-black">
+        <div className="flex flex-col xl:flex-row items-start justify-center gap-6 xl:gap-8 w-full max-w-6xl sm:pt-4 pb-24 sm:pb-10">
+          {/* FEED COLUMN SKELETON */}
+          {/* Menggunakan class yang sama persis: w-full max-w-[630px] mx-auto xl:mx-0 */}
+          <div className="w-full max-w-[630px] shrink-0 min-w-0 mx-auto xl:mx-0 space-y-4">
+            {/* Stories Skeleton */}
+            <div className="border border-[#262626] rounded-2xl bg-black p-4 animate-pulse overflow-x-auto">
+              <div className="flex gap-4">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col items-center gap-2 shrink-0"
+                  >
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white/10" />
+                    <div className="w-10 h-2 rounded bg-white/10" />
+                  </div>
+                ))}
+              </div>
             </div>
+
+            {/* Posts Skeleton */}
             {[...Array(2)].map((_, i) => (
-              <div key={i} className="animate-pulse border border-[#262626] rounded-2xl overflow-hidden">
+              <div
+                key={i}
+                className="animate-pulse border border-[#262626] rounded-2xl overflow-hidden bg-black"
+              >
                 <div className="flex items-center gap-3 p-4">
                   <div className="w-9 h-9 rounded-full bg-white/10 shrink-0" />
                   <div className="h-3 w-32 bg-white/10 rounded" />
                 </div>
-                <div className="w-full aspect-[4/3] bg-white/5" />
+                <div className="w-full aspect-square bg-white/5" />
+                <div className="p-4 space-y-2">
+                  <div className="h-3 w-full bg-white/10 rounded" />
+                  <div className="h-3 w-2/3 bg-white/10 rounded" />
+                </div>
               </div>
             ))}
           </div>
-          <div className="hidden xl:block shrink-0 w-[320px] animate-pulse space-y-4">
-            <div className="h-12 bg-white/10 rounded-xl" />
-            <div className="h-40 bg-white/5 rounded-xl" />
+
+          {/* RIGHT SIDEBAR SKELETON (Hanya muncul di Desktop XL) */}
+          <div className="hidden xl:block shrink-0 w-[320px] sticky top-6 h-fit space-y-4">
+            <div className="h-12 bg-white/10 rounded-xl animate-pulse" />
+            <div className="h-40 bg-white/5 rounded-xl animate-pulse" />
           </div>
         </div>
       </div>
     );
   }
 
+  /* ── Main Content ─── */
   return (
-    /**
-     * Perfect Viewport Centering & Flexible Responsive Feed Layout:
-     * - Feed Column: max-w-[630px] centered
-     * - Right Sidebar: w-[320px] right next to feed (xl+)
-     * - Combined Unit: max-w-[982px] perfectly centered in viewport!
-     */
-    <div className="w-full flex justify-center">
-      <div className="flex items-start justify-center gap-8 w-full max-w-[985px]">
-        {/* ── FEED COLUMN (Max-width 630px) ── */}
-        <div className="w-full max-w-[630px] shrink-0 min-w-0">
+    <div className="w-full min-h-screen flex justify-center bg-black">
+      <div className="flex flex-col xl:flex-row items-start justify-center gap-6 xl:gap-8 w-full max-w-6xl sm:pt-4 pb-24 sm:pb-10">
+        {/* ─ FEED COLUMN ── */}
+        <div className="w-full max-w-[630px] shrink-0 min-w-0 mx-auto xl:mx-0">
           {/* Stories */}
           <motion.div
             initial={{ opacity: 0, y: -6 }}
@@ -127,9 +141,9 @@ export default function HomePage() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="border border-[#262626] rounded-2xl p-16 text-center bg-black"
+                className="border border-[#262626] rounded-2xl p-8 sm:p-16 text-center bg-black mt-4"
               >
-                <p className="text-4xl mb-3">📷</p>
+                <p className="text-4xl mb-3"></p>
                 <p className="text-white font-bold text-base">No posts yet</p>
                 <p className="text-[#737373] text-sm mt-1">
                   Start following people to see their posts here.
@@ -175,12 +189,12 @@ export default function HomePage() {
           )}
         </div>
 
-        {/* ── RIGHT SIDEBAR (xl+) ── */}
+        {/* ─ RIGHT SIDEBAR ─ */}
         <motion.div
           initial={{ opacity: 0, x: 10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="hidden xl:block shrink-0 w-[320px] sticky top-6"
+          className="hidden xl:block shrink-0 w-[320px] sticky top-6 h-fit"
         >
           <RightSidebar user={user} />
         </motion.div>
