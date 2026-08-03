@@ -50,14 +50,31 @@ cd Frontend_InstaApp_Sevima
 
 # 2. Install dependency
 npm install
+```
 
-# 3. Jalankan dev server
+### 3. Konfigurasi Environment
+
+Buat file `.env` di root folder project (sejajar dengan `package.json`), lalu isi dengan:
+
+```env
+VITE_API_URL=http://localhost:8000/api
+VITE_STORAGE_URL=http://localhost:8000/storage
+```
+
+- `VITE_API_URL` — dipakai di `src/services/api.js` sebagai `baseURL` axios, untuk semua request ke endpoint API (login, posts, comments, dll).
+- `VITE_STORAGE_URL` — dipakai untuk membangun URL gambar post (fungsi `getImageUrl`), mengarah ke folder `storage` publik Laravel (**tanpa** `/api`).
+
+> **Penting:** Vite hanya membaca variabel env dengan prefix `VITE_`, dan **hanya di-load saat dev server pertama kali start**. Kalau `.env` diubah setelah `npm run dev` sudah jalan, wajib hentikan server (`Ctrl+C`) dan jalankan ulang `npm run dev` supaya perubahan terbaca.
+>
+> Sesuaikan nilai `VITE_API_URL` dan `VITE_STORAGE_URL` kalau backend Laravel dijalankan di alamat/port yang berbeda dari default.
+
+### 4. Jalankan dev server
+
+```bash
 npm run dev
 ```
 
 Aplikasi akan jalan di `http://localhost:5173`.
-
-> **Catatan:** URL API backend saat ini di-set langsung di `src/services/api.js` (`BASE_URL`). Pastikan backend Laravel sudah berjalan di alamat yang sesuai (default: `http://localhost:8000/api`) sebelum menjalankan frontend, atau ubah `BASE_URL` sesuai kebutuhan.
 
 ## Build untuk Produksi
 
@@ -65,4 +82,4 @@ Aplikasi akan jalan di `http://localhost:5173`.
 npm run build
 ```
 
-Hasil build ada di folder `dist/`, siap di-deploy ke static hosting (Vercel, Netlify, dsb).
+Hasil build ada di folder `dist/`, siap di-deploy ke static hosting (Vercel, Netlify, dsb). Jangan lupa set `VITE_API_URL` dan `VITE_STORAGE_URL` sesuai environment production (misal domain API yang sudah di-deploy) lewat pengaturan environment variable di platform hosting yang dipakai.
